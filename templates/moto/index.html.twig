@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Moto index{% endblock %}
+
+{% block body %}
+    <h1>Moto index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Marque</th>
+                <th>Modele</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for moto in motos %}
+            <tr>
+                <td>{{ moto.id }}</td>
+                <td>{{ moto.marque }}</td>
+                <td>{{ moto.modele }}</td>
+                <td>
+                    <a href="{{ path('app_moto_show', {'id': moto.id}) }}">show</a>
+                    <a href="{{ path('app_moto_edit', {'id': moto.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_moto_new') }}">Create new</a>
+{% endblock %}

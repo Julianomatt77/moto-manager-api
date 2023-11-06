@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Moto{% endblock %}
+
+{% block body %}
+    <h1>Create new Moto</h1>
+
+    {{ include('moto/_form.html.twig') }}
+
+    <a href="{{ path('app_moto_index') }}">back to list</a>
+{% endblock %}
