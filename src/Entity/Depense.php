@@ -11,6 +11,9 @@ use ApiPlatform\Metadata\Post;
 use App\Repository\DepenseRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\User;
+use App\Entity\Moto;
+use App\Entity\DepenseType;
 
 #[ORM\Entity(repositoryClass: DepenseRepository::class)]
 #[ApiResource(
