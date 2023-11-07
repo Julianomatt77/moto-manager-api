@@ -33,9 +33,9 @@ class Depense
     #[ORM\Column]
     private ?float $montant = null;
 
-    #[ORM\ManyToOne(inversedBy: 'depenses')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?user $user = null;
+//    #[ORM\ManyToOne(inversedBy: 'depenses')]
+//    #[ORM\JoinColumn(nullable: false)]
+//    private ?user $user = null;
 
     #[ORM\Column(nullable: true)]
     private ?float $km_parcouru = null;
@@ -55,13 +55,13 @@ class Depense
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
-    #[ORM\ManyToOne(inversedBy: 'depenses')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?moto $moto = null;
-
-    #[ORM\ManyToOne(inversedBy: 'depenses')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?depenseType $depense_type = null;
+//    #[ORM\ManyToOne(inversedBy: 'depenses')]
+//    #[ORM\JoinColumn(nullable: false)]
+//    private ?moto $moto = null;
+//
+//    #[ORM\ManyToOne(inversedBy: 'depenses')]
+//    #[ORM\JoinColumn(nullable: false)]
+//    private ?depenseType $depense_type = null;
 
     public function getId(): ?int
     {
@@ -80,17 +80,17 @@ class Depense
         return $this;
     }
 
-    public function getUser(): ?user
-    {
-        return $this->user;
-    }
-
-    public function setUser(?user $user): static
-    {
-        $this->user = $user;
-
-        return $this;
-    }
+//    public function getUser(): ?user
+//    {
+//        return $this->user;
+//    }
+//
+//    public function setUser(?user $user): static
+//    {
+//        $this->user = $user;
+//
+//        return $this;
+//    }
 
     public function getKmParcouru(): ?float
     {
@@ -164,27 +164,27 @@ class Depense
         return $this;
     }
 
-    public function getMoto(): ?moto
-    {
-        return $this->moto;
-    }
+//    public function getMoto(): ?moto
+//    {
+//        return $this->moto;
+//    }
+//
+//    public function setMoto(?moto $moto): static
+//    {
+//        $this->moto = $moto;
+//
+//        return $this;
+//    }
 
-    public function setMoto(?moto $moto): static
-    {
-        $this->moto = $moto;
-
-        return $this;
-    }
-
-    public function getDepenseType(): ?depenseType
-    {
-        return $this->depense_type;
-    }
-
-    public function setDepenseType(?depenseType $depense_type): static
-    {
-        $this->depense_type = $depense_type;
-
-        return $this;
-    }
+//    public function getDepenseType(): ?depenseType
+//    {
+//        return $this->depense_type;
+//    }
+//
+//    public function setDepenseType(?depenseType $depense_type): static
+//    {
+//        $this->depense_type = $depense_type;
+//
+//        return $this;
+//    }
 }

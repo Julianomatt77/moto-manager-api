@@ -34,13 +34,13 @@ class DepenseType
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'depense_type', targetEntity: Depense::class)]
-    private Collection $depenses;
+//    #[ORM\OneToMany(mappedBy: 'depense_type', targetEntity: Depense::class)]
+//    private Collection $depenses;
 
-    public function __construct()
-    {
-        $this->depenses = new ArrayCollection();
-    }
+//    public function __construct()
+//    {
+//        $this->depenses = new ArrayCollection();
+//    }
 
     public function getId(): ?int
     {
@@ -62,30 +62,30 @@ class DepenseType
     /**
      * @return Collection<int, Depense>
      */
-    public function getDepenses(): Collection
-    {
-        return $this->depenses;
-    }
-
-    public function addDepense(Depense $depense): static
-    {
-        if (!$this->depenses->contains($depense)) {
-            $this->depenses->add($depense);
-            $depense->setDepenseType($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDepense(Depense $depense): static
-    {
-        if ($this->depenses->removeElement($depense)) {
-            // set the owning side to null (unless already changed)
-            if ($depense->getDepenseType() === $this) {
-                $depense->setDepenseType(null);
-            }
-        }
-
-        return $this;
-    }
+//    public function getDepenses(): Collection
+//    {
+//        return $this->depenses;
+//    }
+//
+//    public function addDepense(Depense $depense): static
+//    {
+//        if (!$this->depenses->contains($depense)) {
+//            $this->depenses->add($depense);
+//            $depense->setDepenseType($this);
+//        }
+//
+//        return $this;
+//    }
+//
+//    public function removeDepense(Depense $depense): static
+//    {
+//        if ($this->depenses->removeElement($depense)) {
+//            // set the owning side to null (unless already changed)
+//            if ($depense->getDepenseType() === $this) {
+//                $depense->setDepenseType(null);
+//            }
+//        }
+//
+//        return $this;
+//    }
 }

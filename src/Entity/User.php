@@ -29,21 +29,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Depense::class)]
-    private Collection $depenses;
-
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Entretien::class)]
-    private Collection $entretiens;
+//    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Depense::class)]
+//    private Collection $depenses;
+//
+//    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Entretien::class)]
+//    private Collection $entretiens;
 
 //    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Moto::class)]
 //    private Collection $motos;
 
-    public function __construct()
-    {
-        $this->depenses = new ArrayCollection();
-        $this->entretiens = new ArrayCollection();
-//        $this->motos = new ArrayCollection();
-    }
+//    public function __construct()
+//    {
+//        $this->depenses = new ArrayCollection();
+//        $this->entretiens = new ArrayCollection();
+////        $this->motos = new ArrayCollection();
+//    }
 
     public function getId(): ?int
     {
@@ -118,62 +118,62 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Depense>
      */
-    public function getDepenses(): Collection
-    {
-        return $this->depenses;
-    }
-
-    public function addDepense(Depense $depense): static
-    {
-        if (!$this->depenses->contains($depense)) {
-            $this->depenses->add($depense);
-            $depense->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDepense(Depense $depense): static
-    {
-        if ($this->depenses->removeElement($depense)) {
-            // set the owning side to null (unless already changed)
-            if ($depense->getUser() === $this) {
-                $depense->setUser(null);
-            }
-        }
-
-        return $this;
-    }
+//    public function getDepenses(): Collection
+//    {
+//        return $this->depenses;
+//    }
+//
+//    public function addDepense(Depense $depense): static
+//    {
+//        if (!$this->depenses->contains($depense)) {
+//            $this->depenses->add($depense);
+//            $depense->setUser($this);
+//        }
+//
+//        return $this;
+//    }
+//
+//    public function removeDepense(Depense $depense): static
+//    {
+//        if ($this->depenses->removeElement($depense)) {
+//            // set the owning side to null (unless already changed)
+//            if ($depense->getUser() === $this) {
+//                $depense->setUser(null);
+//            }
+//        }
+//
+//        return $this;
+//    }
 
     /**
      * @return Collection<int, Entretien>
      */
-    public function getEntretiens(): Collection
-    {
-        return $this->entretiens;
-    }
-
-    public function addEntretien(Entretien $entretien): static
-    {
-        if (!$this->entretiens->contains($entretien)) {
-            $this->entretiens->add($entretien);
-            $entretien->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeEntretien(Entretien $entretien): static
-    {
-        if ($this->entretiens->removeElement($entretien)) {
-            // set the owning side to null (unless already changed)
-            if ($entretien->getUser() === $this) {
-                $entretien->setUser(null);
-            }
-        }
-
-        return $this;
-    }
+//    public function getEntretiens(): Collection
+//    {
+//        return $this->entretiens;
+//    }
+//
+//    public function addEntretien(Entretien $entretien): static
+//    {
+//        if (!$this->entretiens->contains($entretien)) {
+//            $this->entretiens->add($entretien);
+//            $entretien->setUser($this);
+//        }
+//
+//        return $this;
+//    }
+//
+//    public function removeEntretien(Entretien $entretien): static
+//    {
+//        if ($this->entretiens->removeElement($entretien)) {
+//            // set the owning side to null (unless already changed)
+//            if ($entretien->getUser() === $this) {
+//                $entretien->setUser(null);
+//            }
+//        }
+//
+//        return $this;
+//    }
 
     /**
      * @return Collection<int, Moto>
