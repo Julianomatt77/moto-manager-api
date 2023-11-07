@@ -26,6 +26,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Post(),
     ],
     formats: ["json"],
+//	security:
 //    normalizationContext: ['groups' => ['read']],
 //    denormalizationContext: ['groups' => ['write']]
 )]

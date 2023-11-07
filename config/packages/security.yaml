@@ -1,4 +1,6 @@
 security:
+    enable_authenticator_manager: true
+
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
@@ -10,12 +12,42 @@ security:
                 class: App\Entity\User
                 property: email
     firewalls:
+        login:
+            pattern: ^/api/login
+            stateless: true
+            json_login:
+                check_path: /api/login_check
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        api:
+            pattern: ^/api
+            stateless: true
+            jwt: ~
+
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+
         main:
             lazy: true
             provider: app_user_provider
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        - { path: ^/api/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/depense_types,       roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/depenses,       roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/entretiens,       roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/motos,       roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api,       roles: PUBLIC_ACCESS }
+
+
+#    firewalls:
+#        main:
+#            lazy: true
+#            provider: app_user_provider
 #            custom_authenticator: App\Security\UserAuthenticator
 
             # activate different ways to authenticate
@@ -26,7 +58,7 @@ security:
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
-    access_control:
+#    access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
