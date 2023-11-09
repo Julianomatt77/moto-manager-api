@@ -5,21 +5,46 @@ namespace App\Controller;
 use App\Entity\Moto;
 use App\Form\MotoType;
 use App\Repository\MotoRepository;
+use App\Service\AnnuaireService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\HttpFoundation\Cookie;
 
-#[Route('/moto')]
+
+#[Route('/api/moto')]
 class MotoController extends AbstractController
 {
+	
+	public function __construct(TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager)
+	{
+		$this->jwtManager = $jwtManager;
+		$this->tokenStorageInterface = $tokenStorageInterface;
+	}
+	
+	
     #[Route('/', name: 'app_moto_index', methods: ['GET'])]
-    public function index(MotoRepository $motoRepository): Response
+    public function index(MotoRepository $motoRepository, AnnuaireService $annuaire, Request $request): Response
     {
-        return $this->render('moto/index.html.twig', [
-            'motos' => $motoRepository->findAll(),
-        ]);
+		$token = $request->headers->get('Authorization');
+
+		// $decodedJwtToken["username"]
+		// Marche avec bearer Token
+		$decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
+		$decodedJwtToken['token'] = $token;
+		
+		$json = json_encode($decodedJwtToken);
+		
+		return new JsonResponse($json, 200, [], true);
+//        return $this->render('moto/index.html.twig', [
+//            'motos' => $motoRepository->findAll(),
+//        ]);
     }
 
     #[Route('/new', name: 'app_moto_new', methods: ['GET', 'POST'])]

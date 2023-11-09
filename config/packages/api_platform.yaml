@@ -24,6 +24,13 @@ api_platform:
         geojson: [ 'application/vnd.geo+json' ]
         jsonpatch: [ 'application/json-patch+json' ]
         pdf: [ 'application/pdf' ]
+        jwt:
+            mime_types:
+                - "application/jwt"
+
+    http_cache:
+        invalidation:
+            enabled: false
 #    formats:
 #        jsonld: ['application/ld+json']
 #    docs_formats:

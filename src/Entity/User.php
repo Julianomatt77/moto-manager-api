@@ -54,12 +54,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 //    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Moto::class)]
 //    private Collection $motos;
 
-//    public function __construct()
-//    {
+    public function __construct()
+    {
 //        $this->depenses = new ArrayCollection();
 //        $this->entretiens = new ArrayCollection();
-////        $this->motos = new ArrayCollection();
-//    }
+//        $this->motos = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -208,7 +208,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 //
 //        return $this;
 //    }
-
+//
 //    public function removeMoto(Moto $moto): static
 //    {
 //        if ($this->motos->removeElement($moto)) {
