@@ -3,104 +3,113 @@
 namespace App\Controller;
 
 use App\Entity\Moto;
-use App\Form\MotoType;
 use App\Repository\MotoRepository;
+use App\Repository\UserRepository;
 use App\Service\AnnuaireService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 
-
-#[Route('/api/moto')]
+#[AsController]
 class MotoController extends AbstractController
 {
-	
-	public function __construct(TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager)
+	public function __construct(TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager, UserRepository $userRepository, AnnuaireService $annuaire)
 	{
 		$this->jwtManager = $jwtManager;
 		$this->tokenStorageInterface = $tokenStorageInterface;
+		$this->userRepository = $userRepository;
+		$this->annuaire = $annuaire;
 	}
-	
-	
-    #[Route('/', name: 'app_moto_index', methods: ['GET'])]
-    public function index(MotoRepository $motoRepository, AnnuaireService $annuaire, Request $request): Response
-    {
-		$token = $request->headers->get('Authorization');
 
-		// $decodedJwtToken["username"]
-		// Marche avec bearer Token
-		$decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
-		$decodedJwtToken['token'] = $token;
+	#[Route(
+		path: '/api/motos', name: 'app_moto_all', defaults: ['_api_resource_class' => Moto::class,], methods: ['GET'],
+	)]
+    public function index(MotoRepository $motoRepository, Request $request, SerializerInterface $serializer): Response
+    {
+		$user = $this->annuaire->getUser($request);
+		$motos = $motoRepository->findByUser($user);
 		
-		$json = json_encode($decodedJwtToken);
+		// Utilisez le composant Serializer pour personnaliser la sortie
+		$json = $serializer->serialize($motos, 'json', ['groups' => 'moto:read']);
 		
 		return new JsonResponse($json, 200, [], true);
-//        return $this->render('moto/index.html.twig', [
-//            'motos' => $motoRepository->findAll(),
-//        ]);
     }
 
-    #[Route('/new', name: 'app_moto_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+	#[Route(
+		path: '/api/motos', name: 'app_moto_new', defaults: ['_api_resource_class' => Moto::class,], methods: ['POST'],
+	)]
+    public function new(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): Response
     {
-        $moto = new Moto();
-        $form = $this->createForm(MotoType::class, $moto);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($moto);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_moto_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('moto/new.html.twig', [
-            'moto' => $moto,
-            'form' => $form,
-        ]);
+		$user = $this->annuaire->getUser($request);
+		$content = $request->getContent();
+		
+		// Transforme le contenu JSON en un objet Moto
+		$moto = $serializer->deserialize($content, Moto::class, 'json', ['groups' => 'moto:write']);
+		$moto->setUser($user);
+		
+		// Enregistre l'objet Moto en base de données
+		$entityManager->persist($moto);
+		$entityManager->flush();
+		
+		return new JsonResponse($serializer->serialize($moto, 'json'), 201, [], true);
     }
 
-    #[Route('/{id}', name: 'app_moto_show', methods: ['GET'])]
-    public function show(Moto $moto): Response
+	#[Route(
+		path: '/api/motos/{id}', name: 'app_moto_show', defaults: ['_api_resource_class' => Moto::class,], methods: ['GET'],
+	)]
+    public function show(MotoRepository $motoRepository, Moto $moto, Request $request, SerializerInterface $serializer): Response
     {
-        return $this->render('moto/show.html.twig', [
-            'moto' => $moto,
-        ]);
+		$user = $this->annuaire->getUser($request);
+		$moto = $motoRepository->findOneBy(['id'=>$moto->getId(), 'user'=>$user]);
+		
+		$json = $serializer->serialize($moto, 'json', ['groups' => 'moto:read']);
+		
+		return new JsonResponse($json, 200, [], true);
     }
 
-    #[Route('/{id}/edit', name: 'app_moto_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Moto $moto, EntityManagerInterface $entityManager): Response
+	#[Route(
+		path: '/api/motos/{id}', name: 'app_moto_edit', defaults: ['_api_resource_class' => Moto::class,], methods: ['PATCH'],
+	)]
+    public function edit(Request $request, Moto $moto, EntityManagerInterface $entityManager, MotoRepository $motoRepository, SerializerInterface $serializer): Response
     {
-        $form = $this->createForm(MotoType::class, $moto);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_moto_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('moto/edit.html.twig', [
-            'moto' => $moto,
-            'form' => $form,
-        ]);
+		$user = $this->annuaire->getUser($request);
+		// Si l'utilisateur force l'url avec une moto ne lui appartenant pas -> $moto sera null donc on ne met pas à jour
+		$moto = $motoRepository->findOneBy(['id'=>$moto->getId(), 'user'=>$user]);
+		
+		if ($moto){
+			$content = $request->getContent();
+			$moto = $serializer->deserialize($content, Moto::class, 'json', ['groups' => 'moto:write', 'object_to_populate' => $moto]);
+			$entityManager->persist($moto);
+			$entityManager->flush();
+			
+			return new JsonResponse($serializer->serialize($moto, 'json'), 200, [], true);
+		} else {
+			return new JsonResponse(['error' => 'Moto introuvable'], 401);
+		}
     }
-
-    #[Route('/{id}', name: 'app_moto_delete', methods: ['POST'])]
-    public function delete(Request $request, Moto $moto, EntityManagerInterface $entityManager): Response
+	
+	#[Route(
+		path: '/api/motos/{id}', name: 'app_moto_delete', defaults: ['_api_resource_class' => Moto::class,], methods: ['DELETE'],
+	)]
+    public function delete(Request $request, Moto $moto, EntityManagerInterface $entityManager, MotoRepository $motoRepository, SerializerInterface $serializer): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$moto->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($moto);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_moto_index', [], Response::HTTP_SEE_OTHER);
+		$user = $this->annuaire->getUser($request);
+		// Si l'utilisateur force l'url avec une moto ne lui appartenant pas -> $moto sera null donc on ne supprime pas
+		$moto = $motoRepository->findOneBy(['id'=>$moto->getId(), 'user'=>$user]);
+		
+		if ($moto){
+			$entityManager->remove($moto);
+			$entityManager->flush();
+			return new JsonResponse('moto supprimée', 202,);
+		} else {
+			return new JsonResponse(['error' => 'Moto introuvable'], 401);
+		}
     }
 }

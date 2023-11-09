@@ -2,15 +2,35 @@
 
 namespace App\Service;
 
+use App\Repository\UserRepository;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 class AnnuaireService
 {
 //	private $cookieName;
 	
-	public function __construct(
+	public function __construct(TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager, UserRepository $userRepository
 //		string $authCookieName,
 	) {
+		$this->jwtManager = $jwtManager;
+		$this->tokenStorageInterface = $tokenStorageInterface;
+		$this->userRepository = $userRepository;
 //		$this->cookieName = $authCookieName;
 //		$this->cookieName = 'auth_cookie';
+	}
+	
+	public function getUser(Request $request){
+		$token = $request->headers->get('Authorization');
+		// Décoder le token pour récupérer le user
+		// Marche avec bearer Token
+//		$userInfos = json_encode($decodedJwtToken);
+		$decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
+//		$decodedJwtToken['token'] = $token;
+		$username = $decodedJwtToken["username"];
+		
+		return $this->userRepository->findOneBy(['email' => $username]);
 	}
 	
 	/**

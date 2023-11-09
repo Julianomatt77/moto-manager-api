@@ -14,18 +14,19 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-//#[ApiResource(
-//	operations: [
-//		new Get(),
-//		new Patch(),
-//		new Delete(),
-//		new GetCollection(),
-//		new Post(),
-//	],
-//	formats: ["json"],
-//)]
+#[ApiResource(
+	operations: [
+		new Get(),
+		new Patch(),
+		new Delete(),
+		new GetCollection(),
+		new Post(),
+	],
+	formats: ["json"],
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -34,6 +35,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+	#[Groups('moto:read')]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -51,14 +53,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 //    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Entretien::class)]
 //    private Collection $entretiens;
 
-//    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Moto::class)]
-//    private Collection $motos;
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Moto::class)]
+    private Collection $motos;
 
     public function __construct()
     {
 //        $this->depenses = new ArrayCollection();
 //        $this->entretiens = new ArrayCollection();
-//        $this->motos = new ArrayCollection();
+        $this->motos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -194,30 +196,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Moto>
      */
-//    public function getMotos(): Collection
-//    {
-//        return $this->motos;
-//    }
-//
-//    public function addMoto(Moto $moto): static
-//    {
-//        if (!$this->motos->contains($moto)) {
-//            $this->motos->add($moto);
-//            $moto->setUser($this);
-//        }
-//
-//        return $this;
-//    }
-//
-//    public function removeMoto(Moto $moto): static
-//    {
-//        if ($this->motos->removeElement($moto)) {
-//            // set the owning side to null (unless already changed)
-//            if ($moto->getUser() === $this) {
-//                $moto->setUser(null);
-//            }
-//        }
-//
-//        return $this;
-//    }
+    public function getMotos(): Collection
+    {
+        return $this->motos;
+    }
+
+    public function addMoto(Moto $moto): static
+    {
+        if (!$this->motos->contains($moto)) {
+            $this->motos->add($moto);
+            $moto->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMoto(Moto $moto): static
+    {
+        if ($this->motos->removeElement($moto)) {
+            // set the owning side to null (unless already changed)
+            if ($moto->getUser() === $this) {
+                $moto->setUser(null);
+            }
+        }
+
+        return $this;
+    }
 }

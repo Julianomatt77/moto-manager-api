@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Moto;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -24,17 +25,17 @@ class MotoRepository extends ServiceEntityRepository
 //    /**
 //     * @return Moto[] Returns an array of Moto objects
 //     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('m.id', 'ASC')
+    public function findByUser(User $user): array
+    {
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.user = :val')
+            ->setParameter('val', $user)
+            ->orderBy('m.marque', 'ASC')
 //            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
 //    public function findOneBySomeField($value): ?Moto
 //    {

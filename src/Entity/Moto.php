@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\User;
 use ApiPlatform\Action\NotFoundAction;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -10,21 +11,22 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Controller\MotoController;
 use App\Repository\MotoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MotoRepository::class)]
-#[ApiResource(
-    operations: [
-        new Get(),
-        new Patch(),
-        new Delete(),
-        new GetCollection(),
-        new Post(),
-    ],
+#[ApiResource(operations: [
+		new GetCollection(uriTemplate: '/api/motos', controller: MotoController::class, name: 'app_moto_all'),
+		new Post(uriTemplate: '/api/motos', controller: MotoController::class, denormalizationContext: ['groups' => ['moto:write']], name: 'app_moto_new'),
+		new Get(uriTemplate: '/api/motos/{id}', controller: MotoController::class, denormalizationContext: ['groups' => ['moto:read']], name: 'app_moto_show'),
+		new Delete(uriTemplate: '/api/motos/{id}', controller: MotoController::class, denormalizationContext: ['groups' => ['moto:write']], name: 'app_moto_delete'),
+		new Patch(uriTemplate: '/api/motos/{id}', controller: MotoController::class, denormalizationContext: ['groups' => ['moto:write']], name: 'app_moto_edit'),
+	],
     formats: ["json"],
 //	security:
 //    normalizationContext: ['groups' => ['read']],
@@ -35,19 +37,23 @@ class Moto
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+	#[Groups(['moto:read', 'moto:write'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+	#[Groups(['moto:read', 'moto:write'])]
     private ?string $marque = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+	#[Groups(['moto:read', 'moto:write'])]
     private ?string $modele = null;
 
-//    #[ORM\ManyToOne(inversedBy: 'motos')]
-//    #[ORM\JoinColumn(nullable: false)]
-//    private ?user $user = null;
+    #[ORM\ManyToOne(inversedBy: 'motos')]
+    #[ORM\JoinColumn(nullable: false)]
+	#[Groups('moto:read')]
+    private ?user $user = null;
 
 //    #[ORM\OneToMany(mappedBy: 'moto', targetEntity: Depense::class)]
 //    private Collection $depenses;
@@ -90,17 +96,17 @@ class Moto
         return $this;
     }
 
-//    public function getUser(): ?user
-//    {
-//        return $this->user;
-//    }
-//
-//    public function setUser(?user $user): static
-//    {
-//        $this->user = $user;
-//
-//        return $this;
-//    }
+    public function getUser(): ?user
+    {
+        return $this->user;
+    }
+
+    public function setUser(?user $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
 
     /**
      * @return Collection<int, Depense>
