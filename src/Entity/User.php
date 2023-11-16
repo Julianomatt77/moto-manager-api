@@ -8,10 +8,13 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Controller\MotoController;
+use App\Controller\UserController;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use OpenApi\Attributes\Examples;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -19,11 +22,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
 	operations: [
-		new Get(),
-		new Patch(),
-		new Delete(),
-		new GetCollection(),
-		new Post(),
+		new Get(uriTemplate: '/api/users/{id}', controller: UserController::class, denormalizationContext: ['groups' => ['user:read']], name: 'app_user_show'),
+//		new Patch(uriTemplate: '/api/users/{id}', controller: UserController::class, denormalizationContext: ['groups' => ['user:write']], name: 'app_user_edit'),
+//		new Delete(uriTemplate: '/api/users/{id}', controller: UserController::class, denormalizationContext: ['groups' => ['user:write']], name: 'app_user_delete'),
+//		new GetCollection(),
+		new Post(uriTemplate: '/register', controller: UserController::class, denormalizationContext: ['groups' => ['user:write']], name: 'api_register'),
 	],
 	formats: ["json"],
 )]
@@ -35,7 +38,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-	#[Groups('moto:read')]
+	#[Groups(['moto:read', 'user:write', 'user:read'])]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -45,6 +48,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+	#[Groups(['user:write', 'user:read'])]
     private ?string $password = null;
 
 //    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Depense::class)]
