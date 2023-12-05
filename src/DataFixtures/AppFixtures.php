@@ -52,10 +52,12 @@ class AppFixtures extends Fixture
 		
 		$depenseType = new DepenseType();
 		$depenseType->setName('essence');
+		$depenseType->setUser($user);
 		$manager->persist($depenseType);
 		
 		$depenseType2 = new DepenseType();
 		$depenseType2->setName('entretien');
+		$depenseType2->setUser($user);
 		$manager->persist($depenseType2);
 		
 		$manager->flush();

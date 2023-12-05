@@ -22,12 +22,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
 	operations: [
-		new Get(uriTemplate: '/api/users/{id}', controller: UserController::class, denormalizationContext: ['groups' => ['user:read']], name: 'app_user_show'),
-//		new Patch(uriTemplate: '/api/users/{id}', controller: UserController::class, denormalizationContext: ['groups' => ['user:write']], name: 'app_user_edit'),
-//		new Delete(uriTemplate: '/api/users/{id}', controller: UserController::class, denormalizationContext: ['groups' => ['user:write']], name: 'app_user_delete'),
-//		new GetCollection(),
-		new Post(uriTemplate: '/register', controller: UserController::class, denormalizationContext: ['groups' => ['user:write']], name: 'api_register'),
-	],
+               		new Get(uriTemplate: '/api/users/{id}', controller: UserController::class, denormalizationContext: ['groups' => ['user:read']], name: 'app_user_show'),
+               //		new Patch(uriTemplate: '/api/users/{id}', controller: UserController::class, denormalizationContext: ['groups' => ['user:write']], name: 'app_user_edit'),
+               //		new Delete(uriTemplate: '/api/users/{id}', controller: UserController::class, denormalizationContext: ['groups' => ['user:write']], name: 'app_user_delete'),
+               //		new GetCollection(),
+               		new Post(uriTemplate: '/register', controller: UserController::class, denormalizationContext: ['groups' => ['user:write']], name: 'api_register'),
+               	],
 	formats: ["json"],
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -51,20 +51,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	#[Groups(['user:write', 'user:read'])]
     private ?string $password = null;
 
-//    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Depense::class)]
-//    private Collection $depenses;
-//
-//    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Entretien::class)]
-//    private Collection $entretiens;
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Depense::class)]
+    private Collection $depenses;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Entretien::class)]
+    private Collection $entretiens;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Moto::class)]
     private Collection $motos;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: DepenseType::class)]
+    private Collection $depenseTypes;
+
     public function __construct()
     {
-//        $this->depenses = new ArrayCollection();
-//        $this->entretiens = new ArrayCollection();
+        $this->depenses = new ArrayCollection();
+        $this->entretiens = new ArrayCollection();
         $this->motos = new ArrayCollection();
+        $this->depenseTypes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -140,62 +144,62 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Depense>
      */
-//    public function getDepenses(): Collection
-//    {
-//        return $this->depenses;
-//    }
-//
-//    public function addDepense(Depense $depense): static
-//    {
-//        if (!$this->depenses->contains($depense)) {
-//            $this->depenses->add($depense);
-//            $depense->setUser($this);
-//        }
-//
-//        return $this;
-//    }
-//
-//    public function removeDepense(Depense $depense): static
-//    {
-//        if ($this->depenses->removeElement($depense)) {
-//            // set the owning side to null (unless already changed)
-//            if ($depense->getUser() === $this) {
-//                $depense->setUser(null);
-//            }
-//        }
-//
-//        return $this;
-//    }
+    public function getDepenses(): Collection
+    {
+        return $this->depenses;
+    }
+
+    public function addDepense(Depense $depense): static
+    {
+        if (!$this->depenses->contains($depense)) {
+            $this->depenses->add($depense);
+            $depense->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDepense(Depense $depense): static
+    {
+        if ($this->depenses->removeElement($depense)) {
+            // set the owning side to null (unless already changed)
+            if ($depense->getUser() === $this) {
+                $depense->setUser(null);
+            }
+        }
+
+        return $this;
+    }
 
     /**
      * @return Collection<int, Entretien>
      */
-//    public function getEntretiens(): Collection
-//    {
-//        return $this->entretiens;
-//    }
-//
-//    public function addEntretien(Entretien $entretien): static
-//    {
-//        if (!$this->entretiens->contains($entretien)) {
-//            $this->entretiens->add($entretien);
-//            $entretien->setUser($this);
-//        }
-//
-//        return $this;
-//    }
-//
-//    public function removeEntretien(Entretien $entretien): static
-//    {
-//        if ($this->entretiens->removeElement($entretien)) {
-//            // set the owning side to null (unless already changed)
-//            if ($entretien->getUser() === $this) {
-//                $entretien->setUser(null);
-//            }
-//        }
-//
-//        return $this;
-//    }
+    public function getEntretiens(): Collection
+    {
+        return $this->entretiens;
+    }
+
+    public function addEntretien(Entretien $entretien): static
+    {
+        if (!$this->entretiens->contains($entretien)) {
+            $this->entretiens->add($entretien);
+            $entretien->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEntretien(Entretien $entretien): static
+    {
+        if ($this->entretiens->removeElement($entretien)) {
+            // set the owning side to null (unless already changed)
+            if ($entretien->getUser() === $this) {
+                $entretien->setUser(null);
+            }
+        }
+
+        return $this;
+    }
 
     /**
      * @return Collection<int, Moto>
@@ -221,6 +225,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($moto->getUser() === $this) {
                 $moto->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DepenseType>
+     */
+    public function getDepenseTypes(): Collection
+    {
+        return $this->depenseTypes;
+    }
+
+    public function addDepenseType(DepenseType $depenseType): static
+    {
+        if (!$this->depenseTypes->contains($depenseType)) {
+            $this->depenseTypes->add($depenseType);
+            $depenseType->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDepenseType(DepenseType $depenseType): static
+    {
+        if ($this->depenseTypes->removeElement($depenseType)) {
+            // set the owning side to null (unless already changed)
+            if ($depenseType->getUser() === $this) {
+                $depenseType->setUser(null);
             }
         }
 

@@ -91,7 +91,7 @@ class MotoController extends AbstractController
 			
 			return new JsonResponse($serializer->serialize($moto, 'json'), 200, [], true);
 		} else {
-			return new JsonResponse(['error' => 'Moto introuvable'], 401);
+			return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], 401);
 		}
     }
 	
@@ -109,7 +109,7 @@ class MotoController extends AbstractController
 			$entityManager->flush();
 			return new JsonResponse('moto supprimée', 202,);
 		} else {
-			return new JsonResponse(['error' => 'Moto introuvable'], 401);
+			return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], 401);
 		}
     }
 }

@@ -45,13 +45,16 @@ class Entretien
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
-//    #[ORM\ManyToOne(inversedBy: 'entretiens')]
-//    #[ORM\JoinColumn(nullable: false)]
-//    private ?user $user = null;
-//
-//    #[ORM\ManyToOne(inversedBy: 'entretiens')]
-//    #[ORM\JoinColumn(nullable: false)]
-//    private ?moto $moto = null;
+    #[ORM\ManyToOne(inversedBy: 'entretiens')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?user $user = null;
+
+    #[ORM\ManyToOne(inversedBy: 'entretiens')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?moto $moto = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $kilometrage = null;
 
     public function getId(): ?int
     {
@@ -118,27 +121,39 @@ class Entretien
         return $this;
     }
 
-//    public function getUser(): ?user
-//    {
-//        return $this->user;
-//    }
-//
-//    public function setUser(?user $user): static
-//    {
-//        $this->user = $user;
-//
-//        return $this;
-//    }
-//
-//    public function getMoto(): ?moto
-//    {
-//        return $this->moto;
-//    }
-//
-//    public function setMoto(?moto $moto): static
-//    {
-//        $this->moto = $moto;
-//
-//        return $this;
-//    }
+    public function getUser(): ?user
+    {
+        return $this->user;
+    }
+
+    public function setUser(?user $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getMoto(): ?moto
+    {
+        return $this->moto;
+    }
+
+    public function setMoto(?moto $moto): static
+    {
+        $this->moto = $moto;
+
+        return $this;
+    }
+
+    public function getKilometrage(): ?float
+    {
+        return $this->kilometrage;
+    }
+
+    public function setKilometrage(?float $kilometrage): static
+    {
+        $this->kilometrage = $kilometrage;
+
+        return $this;
+    }
 }

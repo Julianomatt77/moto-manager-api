@@ -55,17 +55,17 @@ class Moto
 	#[Groups('moto:read')]
     private ?user $user = null;
 
-//    #[ORM\OneToMany(mappedBy: 'moto', targetEntity: Depense::class)]
-//    private Collection $depenses;
-//
-//    #[ORM\OneToMany(mappedBy: 'moto', targetEntity: Entretien::class)]
-//    private Collection $entretiens;
+    #[ORM\OneToMany(mappedBy: 'moto', targetEntity: Depense::class)]
+    private Collection $depenses;
 
-//    public function __construct()
-//    {
-//        $this->depenses = new ArrayCollection();
-//        $this->entretiens = new ArrayCollection();
-//    }
+    #[ORM\OneToMany(mappedBy: 'moto', targetEntity: Entretien::class)]
+    private Collection $entretiens;
+
+    public function __construct()
+    {
+        $this->depenses = new ArrayCollection();
+        $this->entretiens = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -111,60 +111,60 @@ class Moto
     /**
      * @return Collection<int, Depense>
      */
-//    public function getDepenses(): Collection
-//    {
-//        return $this->depenses;
-//    }
-//
-//    public function addDepense(Depense $depense): static
-//    {
-//        if (!$this->depenses->contains($depense)) {
-//            $this->depenses->add($depense);
-//            $depense->setMoto($this);
-//        }
-//
-//        return $this;
-//    }
+    public function getDepenses(): Collection
+    {
+        return $this->depenses;
+    }
 
-//    public function removeDepense(Depense $depense): static
-//    {
-//        if ($this->depenses->removeElement($depense)) {
-//            // set the owning side to null (unless already changed)
-//            if ($depense->getMoto() === $this) {
-//                $depense->setMoto(null);
-//            }
-//        }
-//
-//        return $this;
-//    }
+    public function addDepense(Depense $depense): static
+    {
+        if (!$this->depenses->contains($depense)) {
+            $this->depenses->add($depense);
+            $depense->setMoto($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDepense(Depense $depense): static
+    {
+        if ($this->depenses->removeElement($depense)) {
+            // set the owning side to null (unless already changed)
+            if ($depense->getMoto() === $this) {
+                $depense->setMoto(null);
+            }
+        }
+
+        return $this;
+    }
 
     /**
      * @return Collection<int, Entretien>
      */
-//    public function getEntretiens(): Collection
-//    {
-//        return $this->entretiens;
-//    }
-//
-//    public function addEntretien(Entretien $entretien): static
-//    {
-//        if (!$this->entretiens->contains($entretien)) {
-//            $this->entretiens->add($entretien);
-//            $entretien->setMoto($this);
-//        }
-//
-//        return $this;
-//    }
+    public function getEntretiens(): Collection
+    {
+        return $this->entretiens;
+    }
 
-//    public function removeEntretien(Entretien $entretien): static
-//    {
-//        if ($this->entretiens->removeElement($entretien)) {
-//            // set the owning side to null (unless already changed)
-//            if ($entretien->getMoto() === $this) {
-//                $entretien->setMoto(null);
-//            }
-//        }
-//
-//        return $this;
-//    }
+    public function addEntretien(Entretien $entretien): static
+    {
+        if (!$this->entretiens->contains($entretien)) {
+            $this->entretiens->add($entretien);
+            $entretien->setMoto($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEntretien(Entretien $entretien): static
+    {
+        if ($this->entretiens->removeElement($entretien)) {
+            // set the owning side to null (unless already changed)
+            if ($entretien->getMoto() === $this) {
+                $entretien->setMoto(null);
+            }
+        }
+
+        return $this;
+    }
 }
