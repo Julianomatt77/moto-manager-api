@@ -27,10 +27,19 @@ class DepenseRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('m')
             ->andWhere('m.user = :val')
             ->setParameter('val', $user)
-            ->orderBy('m.date', 'ASC')
+            ->orderBy('m.date', 'DESC')
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
+    }
+
+    public function findLastDepense(User $user){
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.user = :val')
+            ->setParameter('val', $user)
+            ->orderBy('m.date', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
     }
 
 //    /**

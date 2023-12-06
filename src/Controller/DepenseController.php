@@ -47,16 +47,22 @@ class DepenseController extends AbstractController
     #[Route(
         path: '/api/depenses', name: 'app_depenses_new', defaults: ['_api_resource_class' => Depense::class,], methods: ['POST'],
     )]
-    public function new(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, DepenseRepository $depenseRepository): Response
     {
         $user = $this->annuaire->getUser($request);
         $content = json_decode($request->getContent(), true);
+
+        $lastDepense = $depenseRepository->findLastDepense($user);
+        if (isset($lastDepense[0])){
+            $lastKilometrage = $lastDepense[0]->getKilometrage() ?? 0;
+        } else {
+            $lastKilometrage = 0;
+        }
 
         // On récupère les id moto et depenseType et on les transforme en objet
         $moto_id = $content['moto'];
         $depenseType_id = $content['depense_type'];
 
-        //TODO Vérifier si la moto lui appartient ?
         $moto = $entityManager->getRepository(Moto::class)->findOneBy(['id'=>$moto_id, 'user'=>$user]);
         if (!$moto){
             return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], 401);
@@ -73,6 +79,11 @@ class DepenseController extends AbstractController
         if ($depense->getEssenceConsomme() && $depense->getKmParcouru()){
             $conso = ($depense->getEssenceConsomme() * 100) / $depense->getKmParcouru();
             $depense->setConsoMoyenne(round($conso, 2));
+        }
+
+        if (!$depense->getKilometrage() && $depense->getKmParcouru()){
+            $kilometrage = $lastKilometrage + $depense->getKmParcouru();
+            $depense->setKilometrage(round($kilometrage,2));
         }
 
         $depense->setUser($user);
@@ -108,6 +119,13 @@ class DepenseController extends AbstractController
         $depenseType = null;
         $depense = $depenseRepository->findOneBy(['id'=>$depense->getId(), 'user'=>$user]);
 
+        $lastDepense = $depenseRepository->findLastDepense($user);
+        if (isset($lastDepense[0])){
+            $lastKilometrage = $lastDepense[0]->getKilometrage() ?? 0;
+        } else {
+            $lastKilometrage = 0;
+        }
+
         if ($depense){
             $content = json_decode($request->getContent(), true);
 
@@ -134,13 +152,14 @@ class DepenseController extends AbstractController
                 $depense->setConsoMoyenne(round($conso, 2));
             }
 
-            if ($moto){
-                $depense->setMoto($moto);
+            if (!$depense->getKilometrage() && $depense->getKmParcouru()){
+                $kilometrage = $lastKilometrage + $depense->getKmParcouru();
+                $depense->setKilometrage(round($kilometrage,2));
             }
+            //TODO update kilometrage si changement sur ancienne dépense
 
-            if ($depenseType){
-                $depense->setDepenseType($depenseType);
-            }
+            $depense->setMoto($moto ?? $depense->getMoto());
+            $depense->setDepenseType($depenseType ?? $depense->getDepenseType());
 
             $entityManager->persist($depense);
             $entityManager->flush();

@@ -67,7 +67,7 @@ class Depense
     #[Groups(['depenses:read', 'depenses:write'])]
     private ?float $essencePrice = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(['depenses:read', 'depenses:write'])]
     private ?\DateTimeInterface $date = null;
 
@@ -80,6 +80,9 @@ class Depense
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['depenses:read', 'depenses:write'])]
     private ?depenseType $depenseType = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $kilometrage = null;
 
     public function getId(): ?int
     {
@@ -202,6 +205,18 @@ class Depense
     public function setDepenseType(?depenseType $depenseType): static
     {
         $this->depenseType = $depenseType;
+
+        return $this;
+    }
+
+    public function getKilometrage(): ?float
+    {
+        return $this->kilometrage;
+    }
+
+    public function setKilometrage(?float $kilometrage): static
+    {
+        $this->kilometrage = $kilometrage;
 
         return $this;
     }
