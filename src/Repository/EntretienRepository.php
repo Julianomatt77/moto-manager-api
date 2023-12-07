@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Entretien;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,6 +20,26 @@ class EntretienRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Entretien::class);
+    }
+
+    public function findByUser(User $user): array
+    {
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.user = :val')
+            ->setParameter('val', $user)
+            ->orderBy('m.date', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findLastEntretien(User $user){
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.user = :val')
+            ->setParameter('val', $user)
+            ->orderBy('m.date', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
     }
 
 //    /**

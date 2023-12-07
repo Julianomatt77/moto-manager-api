@@ -102,7 +102,7 @@ class DepenseController extends AbstractController
     public function show(DepenseRepository $depenseRepository, Depense $depense, Request $request, SerializerInterface $serializer): Response
     {
         $user = $this->annuaire->getUser($request);
-        $moto = $depenseRepository->findOneBy(['id'=>$depense->getId(), 'user'=>$user]);
+        $depense = $depenseRepository->findOneBy(['id'=>$depense->getId(), 'user'=>$user]);
 
         $json = $serializer->serialize($depense, 'json', ['groups' => 'depenses:read']);
 
@@ -130,7 +130,7 @@ class DepenseController extends AbstractController
             $content = json_decode($request->getContent(), true);
 
             // On récupère les id moto et depenseType et on les transforme en objet
-            if (isset($cntent['moto'])){
+            if (isset($content['moto'])){
                 $moto_id = $content['moto'];
                 $moto = $entityManager->getRepository(Moto::class)->findOneBy(['id'=>$moto_id, 'user'=>$user]);
                 if (!$moto){
