@@ -59,19 +59,25 @@ class DepenseController extends AbstractController
             $lastKilometrage = 0;
         }
 
-        // On récupère les id moto et depenseType et on les transforme en objet
-        $moto_id = $content['moto'];
-        $depenseType_id = $content['depense_type'];
 
-        $moto = $entityManager->getRepository(Moto::class)->findOneBy(['id'=>$moto_id, 'user'=>$user]);
-        if (!$moto){
-            return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], 401);
+        if (isset($content['moto'])){
+            $moto_id = $content['moto'];
+            $moto = $entityManager->getRepository(Moto::class)->findOneBy(['id'=>$moto_id, 'user'=>$user]);
+            if (!$moto){
+                return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], 401);
+            }
+            unset($content['moto']);
         }
-        $depenseType = $entityManager->getRepository(DepenseType::class)->find($depenseType_id);
 
-        // On supprime moto et depense-type sinon pbl de deserialization
-        unset($content['moto']);
-        unset($content['depense_type']);
+
+        if (isset($content['depense_type'])){
+            $depenseType_id = $content['depense_type'];
+            $depenseType = $entityManager->getRepository(DepenseType::class)->findOneBy(['id'=>$depenseType_id, 'user'=>$user]);
+            if (!$depenseType){
+                return new JsonResponse(['error' => 'Type de dépense introuvable ou ne vous appartient pas'], 401);
+            }
+            unset($content['depense_type']);
+        }
 
         // Transforme le contenu JSON en un objet Dépense
         $depense = $serializer->deserialize(json_encode($content), Depense::class, 'json', ['groups' => 'depenses:write']);
@@ -87,8 +93,8 @@ class DepenseController extends AbstractController
         }
 
         $depense->setUser($user);
-        $depense->setMoto($moto);
-        $depense->setDepenseType($depenseType);
+        $depense->setMoto($moto ?? $depense->getMoto());
+        $depense->setDepenseType($depenseType ?? $depense->getDepenseType());
         // Enregistre en base de données
         $entityManager->persist($depense);
         $entityManager->flush();
@@ -141,7 +147,10 @@ class DepenseController extends AbstractController
 
             if (isset($content['depense_type'])){
                 $depenseType_id = $content['depense_type'];
-                $depenseType = $entityManager->getRepository(DepenseType::class)->find($depenseType_id);
+                $depenseType = $entityManager->getRepository(DepenseType::class)->findOneBy(['id'=>$depenseType_id, 'user'=>$user]);
+                if (!$depenseType){
+                    return new JsonResponse(['error' => 'Type de dépense introuvable ou ne vous appartient pas'], 401);
+                }
                 unset($content['depense_type']);
             }
 
