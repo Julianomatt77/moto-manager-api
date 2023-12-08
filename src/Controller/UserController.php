@@ -42,16 +42,16 @@ class UserController extends AbstractController
 	
 	//Création d’un utilisateur
 	#[Route(
-		path: '/register', name: 'api_register', defaults: ['_api_resource_class' => User::class,], methods: ['POST']
+		path: '/api/register', name: 'api_register', defaults: ['_api_resource_class' => User::class,], methods: ['POST']
 	)]
-	public function register(Request $request): JsonResponse
+	public function register(Request $request, UserRepository $userRepository): JsonResponse
 	{
 		$data     = json_decode($request->getContent(), true);
 		$email    = $data["email"];
 		$password = $data["password"];
 
 		//Vérification de l’email
-		$checkEmail = $this->user->findOneBy(['email' => $email]);
+		$checkEmail = $userRepository->findOneBy(['email' => $email]);
 		if ($checkEmail) {
 			return new JsonResponse([
 										"status"  => false,
@@ -72,21 +72,20 @@ class UserController extends AbstractController
 	}
 	
 	#[Route(
-		path: '/api/users/{id}', name: 'app_user_show', defaults: ['_api_resource_class' => User::class,], methods: ['GET'],
+		path: '/api/users-infos', name: 'app_user_show', defaults: ['_api_resource_class' => User::class,], methods: ['GET'],
 	)]
-	public function show( User $user, Request $request, SerializerInterface $serializer): Response
+	public function show( Request $request, SerializerInterface $serializer): Response
 	{
 		$connectedUser = $this->annuaire->getUser($request);
-
-		$user = $this->userRepository->findOneBy(['id'=>$user->getId()]);
-		
-		if ($user == $connectedUser){
-			$json = $serializer->serialize($user, 'json', ['groups' => 'user:read']);
+//		$user = $this->userRepository->findOneBy(['id'=>$connectedUser->getId()]);
+//
+//		if ($user == $connectedUser){
+			$json = $serializer->serialize($connectedUser, 'json', ['groups' => 'user:read']);
 			
 			return new JsonResponse($json, 200, [], true);
-		} else {
-			return new JsonResponse(['error' => 'Utilisateur introuvable ou utilisateur non authorisé'], 401);
-		}
+//		} else {
+//			return new JsonResponse(['error' => 'Utilisateur introuvable ou utilisateur non authorisé'], 401);
+//		}
 		
 		
 	}

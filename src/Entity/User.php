@@ -22,11 +22,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
 	operations: [
-               		new Get(uriTemplate: '/api/users/{id}', controller: UserController::class, denormalizationContext: ['groups' => ['user:read']], name: 'app_user_show'),
+               		new Get(uriTemplate: '/api/users-infos', controller: UserController::class, denormalizationContext: ['groups' => ['user:read']], name: 'app_user_show'),
                //		new Patch(uriTemplate: '/api/users/{id}', controller: UserController::class, denormalizationContext: ['groups' => ['user:write']], name: 'app_user_edit'),
                //		new Delete(uriTemplate: '/api/users/{id}', controller: UserController::class, denormalizationContext: ['groups' => ['user:write']], name: 'app_user_delete'),
                //		new GetCollection(),
-               		new Post(uriTemplate: '/register', controller: UserController::class, denormalizationContext: ['groups' => ['user:write']], name: 'api_register'),
+               		new Post(uriTemplate: '/api/register', controller: UserController::class, denormalizationContext: ['groups' => ['user:write']], name: 'api_register'),
                	],
 	formats: ["json"],
 )]
@@ -35,6 +35,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
@@ -42,13 +43,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
-	#[Groups(['user:write', 'user:read'])]
+	#[Groups(['user:write'])]
     private ?string $password = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Depense::class)]

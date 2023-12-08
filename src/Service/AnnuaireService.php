@@ -25,11 +25,9 @@ class AnnuaireService
 		$token = $request->headers->get('Authorization');
 		// Décoder le token pour récupérer le user
 		// Marche avec bearer Token
-//		$userInfos = json_encode($decodedJwtToken);
+
 		$decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
-//		$decodedJwtToken['token'] = $token;
 		$username = $decodedJwtToken["username"];
-		
 		return $this->userRepository->findOneBy(['email' => $username]);
 	}
 	
