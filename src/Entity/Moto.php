@@ -37,17 +37,17 @@ class Moto
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-	#[Groups(['moto:read', 'moto:write'])]
+	#[Groups(['moto:read', 'moto:write', 'depenses:read', 'depenses:write'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-	#[Groups(['moto:read', 'moto:write'])]
+	#[Groups(['moto:read', 'moto:write', 'depenses:read'])]
     private ?string $marque = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-	#[Groups(['moto:read', 'moto:write'])]
+	#[Groups(['moto:read', 'moto:write', 'depenses:read'])]
     private ?string $modele = null;
 
     #[ORM\ManyToOne(inversedBy: 'motos')]

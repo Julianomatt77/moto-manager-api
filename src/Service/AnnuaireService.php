@@ -22,7 +22,6 @@ class AnnuaireService
 	}
 	
 	public function getUser(Request $request){
-		$token = $request->headers->get('Authorization');
 		// Décoder le token pour récupérer le user
 		// Marche avec bearer Token
 
