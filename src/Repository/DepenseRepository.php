@@ -36,7 +36,7 @@ class DepenseRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('m')
             ->andWhere('m.user = :val')
             ->setParameter('val', $user)
-            ->orderBy('m.date', 'ASC')
+            ->orderBy('m.date', 'DESC')
             ->setMaxResults(1)
             ->getQuery()
             ->getResult();

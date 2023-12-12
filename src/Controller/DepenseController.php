@@ -53,6 +53,7 @@ class DepenseController extends AbstractController
         $content = json_decode($request->getContent(), true);
 
         $lastDepense = $depenseRepository->findLastDepense($user);
+//        dd($lastDepense);
         if (isset($lastDepense[0])){
             $lastKilometrage = $lastDepense[0]->getKilometrage() ?? 0;
         } else {

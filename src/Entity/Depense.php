@@ -82,6 +82,7 @@ class Depense
     private ?depenseType $depenseType = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['depenses:read', 'depenses:write'])]
     private ?float $kilometrage = null;
 
     public function getId(): ?int
