@@ -61,7 +61,7 @@ class Depense
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['depenses:read', 'depenses:write'])]
-    private ?string $essenceType = null;
+    private ?string $commentaire = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['depenses:read', 'depenses:write'])]
@@ -150,14 +150,14 @@ class Depense
         return $this;
     }
 
-    public function getEssenceType(): ?string
+    public function getCommentaire(): ?string
     {
-        return $this->essenceType;
+        return $this->commentaire;
     }
 
-    public function setEssenceType(?string $essenceType): static
+    public function setCommentaire(?string $commentaire): static
     {
-        $this->essenceType = $essenceType;
+        $this->commentaire = $commentaire;
 
         return $this;
     }
