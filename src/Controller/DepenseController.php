@@ -88,9 +88,13 @@ class DepenseController extends AbstractController
             $depense->setConsoMoyenne(round($conso, 2));
         }
 
-        if (!$depense->getKilometrage() && $depense->getKmParcouru()){
-            $kilometrage = $lastKilometrage + $depense->getKmParcouru();
-            $depense->setKilometrage(round($kilometrage,2));
+        if (!$depense->getKilometrage()) {
+            if ($depense->getKmParcouru()) {
+                $kilometrage = $lastKilometrage + $depense->getKmParcouru();
+                $depense->setKilometrage(round($kilometrage, 2));
+            } else {
+                $depense->setKilometrage(round($lastKilometrage, 2));
+            }
         }
 
         $depense->setUser($user);
