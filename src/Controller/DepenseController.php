@@ -71,13 +71,13 @@ class DepenseController extends AbstractController
         }
 
 
-        if (isset($content['depense_type'])){
-            $depenseType_id = $content['depense_type'];
+        if (isset($content['depenseType'])){
+            $depenseType_id = $content['depenseType'];
             $depenseType = $entityManager->getRepository(DepenseType::class)->findOneBy(['id'=>$depenseType_id, 'user'=>$user]);
             if (!$depenseType){
                 return new JsonResponse(['error' => 'Type de dépense introuvable ou ne vous appartient pas'], 401);
             }
-            unset($content['depense_type']);
+            unset($content['depenseType']);
         }
 
         // Transforme le contenu JSON en un objet Dépense
@@ -150,13 +150,13 @@ class DepenseController extends AbstractController
                 unset($content['moto']);
             }
 
-            if (isset($content['depense_type'])){
-                $depenseType_id = $content['depense_type'];
+            if (isset($content['depenseType'])){
+                $depenseType_id = $content['depenseType'];
                 $depenseType = $entityManager->getRepository(DepenseType::class)->findOneBy(['id'=>$depenseType_id, 'user'=>$user]);
                 if (!$depenseType){
                     return new JsonResponse(['error' => 'Type de dépense introuvable ou ne vous appartient pas'], 401);
                 }
-                unset($content['depense_type']);
+                unset($content['depenseType']);
             }
 
             $depense = $serializer->deserialize(json_encode($content), Depense::class, 'json', ['groups' => 'depenses:write', 'object_to_populate' => $depense]);
