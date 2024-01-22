@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -31,13 +32,14 @@ class UserController extends AbstractController
 	private $annuaire;
 	
 	
-	public function __construct(TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager, EntityManagerInterface $manager, UserRepository $userRepository, AnnuaireService $annuaire)
+	public function __construct(TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager, EntityManagerInterface $manager, UserRepository $userRepository, AnnuaireService $annuaire, UserPasswordHasherInterface $userPasswordHasher)
 	{
 		$this->em   = $manager;
 		$this->userRepository = $userRepository;
 		$this->jwtManager = $jwtManager;
 		$this->tokenStorageInterface = $tokenStorageInterface;
 		$this->annuaire = $annuaire;
+        $this->userPasswordHasher = $userPasswordHasher;
 	}
 	
 	//Création d’un utilisateur
@@ -59,8 +61,10 @@ class UserController extends AbstractController
 									]);
 		} else {
 			$user = new User();
-			$user->setEmail($email)->setPassword(sha1($password))->setRoles(["ROLE_USER"]);
-			
+			$user->setEmail($email)
+                ->setPassword($this->userPasswordHasher->hashPassword($user, $password))
+                ->setRoles(["ROLE_USER"]);
+
 			$this->em->persist($user);
 			$this->em->flush();
 			
