@@ -24,10 +24,12 @@ class DepenseRepository extends ServiceEntityRepository
 
     public function findByUser(User $user): array
     {
-        return $this->createQueryBuilder('m')
-            ->andWhere('m.user = :val')
+        return $this->createQueryBuilder('d')
+            ->innerJoin('d.moto', 'm')
+            ->where('m.deletedAt is null')
+            ->andWhere('d.user = :val')
             ->setParameter('val', $user)
-            ->orderBy('m.date', 'DESC')
+            ->orderBy('d.date', 'DESC')
             ->getQuery()
             ->getResult();
     }

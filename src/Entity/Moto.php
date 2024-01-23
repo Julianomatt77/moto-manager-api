@@ -15,11 +15,15 @@ use App\Controller\MotoController;
 use App\Repository\MotoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MotoRepository::class)]
+#[Gedmo\SoftDeleteable(['deletedAt', false, false])]
 #[ApiResource(operations: [
 		new GetCollection(uriTemplate: '/api/motos', controller: MotoController::class, name: 'app_moto_all'),
 		new Post(uriTemplate: '/api/motos', controller: MotoController::class, denormalizationContext: ['groups' => ['moto:write']], name: 'app_moto_new'),
@@ -34,6 +38,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 )]
 class Moto
 {
+    use SoftDeleteableEntity;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -60,6 +66,10 @@ class Moto
 
     #[ORM\OneToMany(mappedBy: 'moto', targetEntity: Entretien::class)]
     private Collection $entretiens;
+
+//    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+//    #[Groups(['moto:read', 'moto:write'])]
+//    protected $deletedAt;
 
     public function __construct()
     {
@@ -167,4 +177,14 @@ class Moto
 
         return $this;
     }
+
+//    public function getDeletedAt()
+//    {
+//        return $this->deletedAt;
+//    }
+//
+//    public function setDeletedAt($deletedAt)
+//    {
+//        $this->deletedAt = $deletedAt;
+//    }
 }

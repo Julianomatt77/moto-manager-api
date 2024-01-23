@@ -24,10 +24,12 @@ class EntretienRepository extends ServiceEntityRepository
 
     public function findByUser(User $user): array
     {
-        return $this->createQueryBuilder('m')
-            ->andWhere('m.user = :val')
+        return $this->createQueryBuilder('e')
+            ->innerJoin('e.moto', 'm')
+            ->where('m.deletedAt is null')
+            ->andWhere('e.user = :val')
             ->setParameter('val', $user)
-            ->orderBy('m.date', 'DESC')
+            ->orderBy('e.date', 'DESC')
             ->getQuery()
             ->getResult();
     }
