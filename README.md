@@ -1,6 +1,6 @@
 # moto-manager-api
 
-- PHP 8.2
+- PHP 8.1
 - Symfony 6.3
 
 ## Installation des dépendances
