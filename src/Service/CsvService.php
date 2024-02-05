@@ -72,14 +72,17 @@ class CsvService
             $date = $entretien->getDate()->format('Y/m/d');
             $graissage = $entretien->getGraissage() ? 'oui' : null;
             $lavage = $entretien->isLavage() ? 'oui' : null;
+            $pressionAv = $entretien->getPressionAv() > 0 ? $entretien->getPressionAv() : null;
+            $pressionAr = $entretien->getPressionAr() > 0 ? $entretien->getPressionAr() : null;
+            $kilometrage = $entretien->getKilometrage() > 0 ? $entretien->getKilometrage() : null;
 
             $list[]=[
                 $date,
                 $graissage,
                 $lavage,
-                $entretien->getPressionAv(),
-                $entretien->getPressionAr(),
-                $entretien->getKilometrage(),
+                $pressionAv,
+                $pressionAr,
+                $kilometrage,
                 $entretien->getMoto()->getModele()
             ];
         }
