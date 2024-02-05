@@ -36,17 +36,7 @@ class ExportController extends AbstractController
 
         $response = $this->csvService->exportDepenses($depenses);
 
-        // If csv fail, return a json file
-        if ($response->getStatusCode() !== 200){
-            $serializer = new EntityJsonSerialize();
-
-            return new Response(
-                json_encode($serializer->jsonSerializeObservationForExport($depenses)),
-                Response::HTTP_OK,
-                ['content-type' => 'application/json']
-            );
-        }
-
+        $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
         return $response;
     }
 
@@ -58,17 +48,7 @@ class ExportController extends AbstractController
 
         $response = $this->csvService->exportEntretiens($entretiens);
 
-        // If csv fail, return a json file
-        if ($response->getStatusCode() !== 200){
-            $serializer = new EntityJsonSerialize();
-
-            return new Response(
-                json_encode($serializer->jsonSerializeObservationForExport($entretiens)),
-                Response::HTTP_OK,
-                ['content-type' => 'application/json']
-            );
-        }
-
+        $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
         return $response;
     }
 }
