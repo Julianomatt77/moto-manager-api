@@ -26,10 +26,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[Gedmo\SoftDeleteable(['deletedAt', false, false])]
 #[ApiResource(operations: [
 		new GetCollection(uriTemplate: '/api/motos', controller: MotoController::class, name: 'app_moto_all'),
+        new GetCollection(uriTemplate: '/api/motos/deactivated', controller: MotoController::class, name: 'app_moto_deactivated'),
 		new Post(uriTemplate: '/api/motos', controller: MotoController::class, denormalizationContext: ['groups' => ['moto:write']], name: 'app_moto_new'),
 		new Get(uriTemplate: '/api/motos/{id}', controller: MotoController::class, denormalizationContext: ['groups' => ['moto:read']], name: 'app_moto_show'),
 		new Delete(uriTemplate: '/api/motos/{id}', controller: MotoController::class, denormalizationContext: ['groups' => ['moto:write']], name: 'app_moto_delete'),
 		new Patch(uriTemplate: '/api/motos/{id}', controller: MotoController::class, denormalizationContext: ['groups' => ['moto:write']], name: 'app_moto_edit'),
+        new Patch(uriTemplate: '/api/motos/reactivate/{id}', controller: MotoController::class, denormalizationContext: ['groups' => ['moto:write']], name: 'app_moto_reactivate'),
 	],
     formats: ["json"],
 //	security:
@@ -67,9 +69,9 @@ class Moto
     #[ORM\OneToMany(mappedBy: 'moto', targetEntity: Entretien::class)]
     private Collection $entretiens;
 
-//    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-//    #[Groups(['moto:read', 'moto:write'])]
-//    protected $deletedAt;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['moto:read', 'moto:write'])]
+    protected $deletedAt;
 
     public function __construct()
     {
@@ -178,13 +180,13 @@ class Moto
         return $this;
     }
 
-//    public function getDeletedAt()
-//    {
-//        return $this->deletedAt;
-//    }
-//
-//    public function setDeletedAt($deletedAt)
-//    {
-//        $this->deletedAt = $deletedAt;
-//    }
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
+    }
 }

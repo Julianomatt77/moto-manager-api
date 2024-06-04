@@ -42,6 +42,24 @@ class MotoController extends AbstractController
 		return new JsonResponse($json, 200, [], true);
     }
 
+    #[Route(
+        path: '/api/motos/deactivated',
+        name: 'app_moto_deactivated',
+        methods: ['GET']
+    )]
+    public function getDeactivated(MotoRepository $motoRepository, Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): Response
+    {
+        $entityManager->getFilters()->disable('softdeleteable');
+
+        $user = $this->annuaire->getUser($request);
+        $motos = $motoRepository->findDeactivatedByUser($user);
+
+        // Utilisez le composant Serializer pour personnaliser la sortie
+        $json = $serializer->serialize($motos, 'json', ['groups' => 'moto:read']);
+
+        return new JsonResponse($json, 200, [], true);
+    }
+
 	#[Route(
 		path: '/api/motos', name: 'app_moto_new', defaults: ['_api_resource_class' => Moto::class,], methods: ['POST'],
 	)]
@@ -111,5 +129,30 @@ class MotoController extends AbstractController
 		} else {
 			return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], 401);
 		}
+    }
+
+    #[Route(
+        path: '/api/motos/reactivate/{id}',
+        name: 'app_moto_reactivate',
+        methods: ['PATCH']
+    )]
+    #[ParamConverter('moto', options: ['disabled' => true])]
+    public function reactivate(Request $request, EntityManagerInterface $entityManager, MotoRepository $motoRepository, SerializerInterface $serializer, int $id): Response
+    {
+        $entityManager->getFilters()->disable('softdeleteable');
+
+        $user = $this->annuaire->getUser($request);
+        $moto = $motoRepository->findOneBy(['id' => $id, 'user' => $user]);
+
+        if ($moto){
+            $moto->setDeletedAt(null);
+
+            $entityManager->persist($moto);
+            $entityManager->flush();
+
+            return new JsonResponse($serializer->serialize($moto, 'json'), 200, [], true);
+        } else {
+            return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], 401);
+        }
     }
 }

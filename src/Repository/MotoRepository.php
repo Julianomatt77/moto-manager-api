@@ -37,6 +37,18 @@ class MotoRepository extends ServiceEntityRepository
         ;
     }
 
+    public function findDeactivatedByUser(User $user): array
+    {
+        return $this->createQueryBuilder('m')
+            ->where('m.deletedAt is not null')
+            ->andWhere('m.user = :val')
+            ->setParameter('val', $user)
+            ->orderBy('m.marque', 'ASC')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
 //    public function findOneBySomeField($value): ?Moto
 //    {
 //        return $this->createQueryBuilder('m')
