@@ -73,6 +73,10 @@ class Moto
     #[Groups(['moto:read', 'moto:write'])]
     protected $deletedAt;
 
+    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
+    #[Groups(['moto:read', 'moto:write'])]
+    private ?int $year = null;
+
     public function __construct()
     {
         $this->depenses = new ArrayCollection();
@@ -188,5 +192,17 @@ class Moto
     public function setDeletedAt($deletedAt)
     {
         $this->deletedAt = $deletedAt;
+    }
+
+    public function getYear(): ?int
+    {
+        return $this->year;
+    }
+
+    public function setYear(?int $year): static
+    {
+        $this->year = $year;
+
+        return $this;
     }
 }
