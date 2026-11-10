@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Moto;
 use App\Repository\MotoRepository;
 use App\Repository\UserRepository;
@@ -11,7 +12,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -39,7 +39,7 @@ class MotoController extends AbstractController
 		// Utilisez le composant Serializer pour personnaliser la sortie
 		$json = $serializer->serialize($motos, 'json', ['groups' => 'moto:read']);
 		
-		return new JsonResponse($json, 200, [], true);
+		return new JsonResponse($json, Response::HTTP_OK, [], true);
     }
 
     #[Route(
@@ -57,7 +57,7 @@ class MotoController extends AbstractController
         // Utilisez le composant Serializer pour personnaliser la sortie
         $json = $serializer->serialize($motos, 'json', ['groups' => 'moto:read']);
 
-        return new JsonResponse($json, 200, [], true);
+        return new JsonResponse($json, Response::HTTP_OK, [], true);
     }
 
 	#[Route(
@@ -76,7 +76,7 @@ class MotoController extends AbstractController
 		$entityManager->persist($moto);
 		$entityManager->flush();
 		
-		return new JsonResponse($serializer->serialize($moto, 'json'), 201, [], true);
+		return new JsonResponse($serializer->serialize($moto, 'json'), Response::HTTP_CREATED, [], true);
     }
 
 	#[Route(
@@ -89,7 +89,7 @@ class MotoController extends AbstractController
 		
 		$json = $serializer->serialize($moto, 'json', ['groups' => 'moto:read']);
 		
-		return new JsonResponse($json, 200, [], true);
+		return new JsonResponse($json, Response::HTTP_OK, [], true);
     }
 
 	#[Route(
@@ -107,9 +107,9 @@ class MotoController extends AbstractController
 			$entityManager->persist($moto);
 			$entityManager->flush();
 			
-			return new JsonResponse($serializer->serialize($moto, 'json'), 200, [], true);
+			return new JsonResponse($serializer->serialize($moto, 'json'), Response::HTTP_OK, [], true);
 		} else {
-			return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], 401);
+			return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], Response::HTTP_UNAUTHORIZED);
 		}
     }
 	
@@ -125,9 +125,9 @@ class MotoController extends AbstractController
 		if ($moto){
 			$entityManager->remove($moto);
 			$entityManager->flush();
-			return new JsonResponse('moto supprimée', 202,);
+			return new JsonResponse('moto supprimée', Response::HTTP_ACCEPTED,);
 		} else {
-			return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], 401);
+			return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], Response::HTTP_UNAUTHORIZED);
 		}
     }
 
@@ -150,9 +150,9 @@ class MotoController extends AbstractController
             $entityManager->persist($moto);
             $entityManager->flush();
 
-            return new JsonResponse($serializer->serialize($moto, 'json'), 200, [], true);
+            return new JsonResponse($serializer->serialize($moto, 'json'), Response::HTTP_OK, [], true);
         } else {
-            return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], 401);
+            return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], Response::HTTP_UNAUTHORIZED);
         }
     }
 }

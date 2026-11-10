@@ -2,10 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Depense;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Entretien;
 use App\Entity\Moto;
-use App\Repository\DepenseRepository;
 use App\Repository\EntretienRepository;
 use App\Repository\UserRepository;
 use App\Service\AnnuaireService;
@@ -15,25 +14,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class EntretienController extends AbstractController
 {
-    private JWTTokenManagerInterface $jwtManager;
-    private TokenStorageInterface $tokenStorageInterface;
-    private UserRepository $userRepository;
-    private AnnuaireService $annuaire;
-    private EntretienRepository $entretienRepository;
-
-    public function __construct(TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager, UserRepository $userRepository, AnnuaireService $annuaire, EntretienRepository $entretienRepository)
+    public function __construct(private readonly TokenStorageInterface $tokenStorageInterface, private readonly JWTTokenManagerInterface $jwtManager, private readonly UserRepository $userRepository, private readonly AnnuaireService $annuaire, private readonly EntretienRepository $entretienRepository)
     {
-        $this->jwtManager = $jwtManager;
-        $this->tokenStorageInterface = $tokenStorageInterface;
-        $this->userRepository = $userRepository;
-        $this->annuaire = $annuaire;
-        $this->entretienRepository = $entretienRepository;
     }
 
     #[Route(
@@ -47,7 +34,7 @@ class EntretienController extends AbstractController
         // Utilisez le composant Serializer pour personnaliser la sortie
         $json = $serializer->serialize($entretiens, 'json', ['groups' => 'entretiens:read']);
 
-        return new JsonResponse($json, 200, [], true);
+        return new JsonResponse($json, Response::HTTP_OK, [], true);
     }
 
     #[Route(
@@ -64,7 +51,7 @@ class EntretienController extends AbstractController
 
         $moto = $entityManager->getRepository(Moto::class)->findOneBy(['id' => $moto_id, 'user' => $user]);
         if (!$moto) {
-            return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], 401);
+            return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], Response::HTTP_UNAUTHORIZED);
         }
 
         // Transforme le contenu JSON en un objet Dépense
@@ -76,7 +63,7 @@ class EntretienController extends AbstractController
         $entityManager->persist($entretien);
         $entityManager->flush();
 
-        return new JsonResponse($serializer->serialize($entretien, 'json'), 201, [], true);
+        return new JsonResponse($serializer->serialize($entretien, 'json'), Response::HTTP_CREATED, [], true);
     }
 
     #[Route(
@@ -88,11 +75,11 @@ class EntretienController extends AbstractController
         $entretien = $this->entretienRepository->findOneBy(['id' => $entretien->getId(), 'user' => $user]);
 
         if (!$entretien) {
-            return new JsonResponse(['error' => "L'entretien recherché n'existe pas ou ne vous appartient pas"], 401);
+            return new JsonResponse(['error' => "L'entretien recherché n'existe pas ou ne vous appartient pas"], Response::HTTP_UNAUTHORIZED);
         }
         $json = $serializer->serialize($entretien, 'json', ['groups' => 'entretiens:read']);
 
-        return new JsonResponse($json, 200, [], true);
+        return new JsonResponse($json, Response::HTTP_OK, [], true);
     }
 
     #[Route(
@@ -105,7 +92,7 @@ class EntretienController extends AbstractController
         $entretien = $this->entretienRepository->findOneBy(['id' => $entretien->getId(), 'user' => $user]);
 
         if (!$entretien) {
-            return new JsonResponse(['error' => 'Entretien introuvable ou ne vous appartenant pas'], 401);
+            return new JsonResponse(['error' => 'Entretien introuvable ou ne vous appartenant pas'], Response::HTTP_UNAUTHORIZED);
         }
 
         $content = json_decode($request->getContent(), true);
@@ -114,7 +101,7 @@ class EntretienController extends AbstractController
             $moto_id = $content['moto'];
             $moto = $entityManager->getRepository(Moto::class)->findOneBy(['id' => $moto_id, 'user' => $user]);
             if (!$moto) {
-                return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], 401);
+                return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], Response::HTTP_UNAUTHORIZED);
             }
             unset($content['moto']);
         }
@@ -126,7 +113,7 @@ class EntretienController extends AbstractController
         $entityManager->persist($entretien);
         $entityManager->flush();
 
-        return new JsonResponse($serializer->serialize($entretien, 'json'), 200, [], true);
+        return new JsonResponse($serializer->serialize($entretien, 'json'), Response::HTTP_OK, [], true);
     }
 
     #[Route(
@@ -140,9 +127,9 @@ class EntretienController extends AbstractController
         if ($entretien){
             $entityManager->remove($entretien);
             $entityManager->flush();
-            return new JsonResponse('Entretien supprimée', 202,);
+            return new JsonResponse('Entretien supprimée', Response::HTTP_ACCEPTED,);
         } else {
-            return new JsonResponse(['error' => 'Entretien introuvable ou ne vous appartenant pas'], 401);
+            return new JsonResponse(['error' => 'Entretien introuvable ou ne vous appartenant pas'], Response::HTTP_UNAUTHORIZED);
         }
     }
 }
