@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTimeInterface;
 use App\Entity\User;
 use App\Entity\Moto;
 use App\Entity\DepenseType;
@@ -69,7 +70,7 @@ class Depense
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(['depenses:read', 'depenses:write'])]
-    private ?\DateTimeInterface $date = null;
+    private ?DateTimeInterface $date = null;
 
     #[ORM\ManyToOne(inversedBy: 'depenses')]
     #[ORM\JoinColumn(nullable: false)]
@@ -174,12 +175,12 @@ class Depense
         return $this;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): ?DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $date): static
+    public function setDate(DateTimeInterface $date): static
     {
         $this->date = $date;
 

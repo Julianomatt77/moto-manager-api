@@ -2,13 +2,8 @@
 
 namespace App\Controller;
 
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
 //use App\Entity\user;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\AnnuaireService;
@@ -19,29 +14,21 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class UserController extends AbstractController
 {
-	private $em;
-	private $userRepository;
-	private $jwtManager;
-	private $tokenStorageInterface;
-	private $annuaire;
-	
-	
-	public function __construct(TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager, EntityManagerInterface $manager, UserRepository $userRepository, AnnuaireService $annuaire, UserPasswordHasherInterface $userPasswordHasher)
-	{
-		$this->em   = $manager;
-		$this->userRepository = $userRepository;
-		$this->jwtManager = $jwtManager;
-		$this->tokenStorageInterface = $tokenStorageInterface;
-		$this->annuaire = $annuaire;
-        $this->userPasswordHasher = $userPasswordHasher;
-	}
-	
+    public function __construct(
+        private readonly TokenStorageInterface $tokenStorageInterface,
+        private readonly JWTTokenManagerInterface $jwtManager,
+        private readonly EntityManagerInterface $em,
+        private readonly UserRepository $userRepository,
+        private readonly AnnuaireService $annuaire,
+        private readonly UserPasswordHasherInterface $userPasswordHasher,
+    ) {
+    }
+
 	//Création d’un utilisateur
 	#[Route(
 		path: '/api/register', name: 'api_register', defaults: ['_api_resource_class' => User::class,], methods: ['POST']
@@ -67,14 +54,14 @@ class UserController extends AbstractController
 
 			$this->em->persist($user);
 			$this->em->flush();
-			
+
 			return new JsonResponse([
 										"status"  => true,
 										"message" => "L’utilisateur a été créé avec succès !"
 									]);
 		}
 	}
-	
+
 	#[Route(
 		path: '/api/users-infos', name: 'app_user_show', defaults: ['_api_resource_class' => User::class,], methods: ['GET'],
 	)]
@@ -85,15 +72,15 @@ class UserController extends AbstractController
 //
 //		if ($user == $connectedUser){
 			$json = $serializer->serialize($connectedUser, 'json', ['groups' => 'user:read']);
-			
-			return new JsonResponse($json, 200, [], true);
+
+			return new JsonResponse($json, Response::HTTP_OK, [], true);
 //		} else {
 //			return new JsonResponse(['error' => 'Utilisateur introuvable ou utilisateur non authorisé'], 401);
 //		}
-		
-		
+
+
 	}
-	
+
 	/*
 	#[Route(
 		path: '/api/users/{id}', name: 'app_user_edit', defaults: ['_api_resource_class' => User::class,], methods: ['PATCH'],
@@ -103,13 +90,13 @@ class UserController extends AbstractController
 		$connectedUser = $this->annuaire->getUser($request);
 		// Si l'utilisateur force l'url avec une user ne lui appartenant pas -> $user sera null donc on ne met pas à jour
 		$user = $userRepository->findOneBy(['id'=>$user->getId()]);
-		
+
 		if ($user && $user == $connectedUser){
 			$content = $request->getContent();
 			$user = $serializer->deserialize($content, User::class, 'json', ['groups' => 'user:write', 'object_to_populate' => $user]);
 			$entityManager->persist($user);
 			$entityManager->flush();
-			
+
 			return new JsonResponse($serializer->serialize($user, 'json'), 200, [], true);
 		} else {
 			return new JsonResponse(['error' => 'user introuvable'], 401);
@@ -125,7 +112,7 @@ class UserController extends AbstractController
 		$user = $this->annuaire->getUser($request);
 		// Si l'utilisateur force l'url avec une user ne lui appartenant pas -> $user sera null donc on ne supprime pas
 		$user = $userRepository->findOneBy(['id'=>$user->getId(), 'user'=>$user]);
-		
+
 		if ($user){
 			$entityManager->remove($user);
 			$entityManager->flush();

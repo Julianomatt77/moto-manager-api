@@ -2,13 +2,14 @@
 
 namespace App\Controller;
 
+use Symfony\Component\Routing\Attribute\Route;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Routing\Annotation\Route;
 
 class MailController extends AbstractController
 {
@@ -18,7 +19,7 @@ class MailController extends AbstractController
 
     private function sendEmail($from, $subject, $message): Response
     {
-        $email = (new Email())
+        $email = new Email()
             ->from('contact@martin-julien-dev.fr')
 //            ->from($from)
             ->to('contact@martin-julien-dev.fr')
@@ -27,7 +28,7 @@ class MailController extends AbstractController
 
         $this->mailer->send($email);
 
-        return new JsonResponse(['ok' => 'mail transmis'], 200, []);
+        return new JsonResponse(['ok' => 'mail transmis'], Response::HTTP_OK, []);
     }
 
     #[Route('/contact', name: 'send_mail')]
@@ -41,9 +42,9 @@ class MailController extends AbstractController
 
         try {
             $this->sendEmail($from, $subject, $message);
-            return new JsonResponse(['ok' => 'mail envoyé'], 200, []);
-        } catch (\Exception $e){
-            return new JsonResponse(['error' => $e->getMessage()], 500);
+            return new JsonResponse(['ok' => 'mail envoyé'], Response::HTTP_OK, []);
+        } catch (Exception $e){
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Depense;
 use App\Entity\DepenseType;
 use App\Entity\Moto;
@@ -15,7 +16,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -41,7 +41,7 @@ class DepenseController extends AbstractController
         // Utilisez le composant Serializer pour personnaliser la sortie
         $json = $serializer->serialize($depenses, 'json', ['groups' => 'depenses:read']);
 
-        return new JsonResponse($json, 200, [], true);
+        return new JsonResponse($json, Response::HTTP_OK, [], true);
     }
 
     #[Route(
@@ -65,7 +65,7 @@ class DepenseController extends AbstractController
             $moto_id = $content['moto'];
             $moto = $entityManager->getRepository(Moto::class)->findOneBy(['id'=>$moto_id, 'user'=>$user]);
             if (!$moto){
-                return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], 401);
+                return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], Response::HTTP_UNAUTHORIZED);
             }
             unset($content['moto']);
         }
@@ -75,7 +75,7 @@ class DepenseController extends AbstractController
             $depenseType_id = $content['depenseType'];
             $depenseType = $entityManager->getRepository(DepenseType::class)->findOneBy(['id'=>$depenseType_id, 'user'=>$user]);
             if (!$depenseType){
-                return new JsonResponse(['error' => 'Type de dépense introuvable ou ne vous appartient pas'], 401);
+                return new JsonResponse(['error' => 'Type de dépense introuvable ou ne vous appartient pas'], Response::HTTP_UNAUTHORIZED);
             }
             unset($content['depenseType']);
         }
@@ -104,7 +104,7 @@ class DepenseController extends AbstractController
         $entityManager->persist($depense);
         $entityManager->flush();
 
-        return new JsonResponse($serializer->serialize($depense, 'json'), 201, [], true);
+        return new JsonResponse($serializer->serialize($depense, 'json'), Response::HTTP_CREATED, [], true);
     }
 
     #[Route(
@@ -117,7 +117,7 @@ class DepenseController extends AbstractController
 
         $json = $serializer->serialize($depense, 'json', ['groups' => 'depenses:read']);
 
-        return new JsonResponse($json, 200, [], true);
+        return new JsonResponse($json, Response::HTTP_OK, [], true);
     }
 
     #[Route(
@@ -145,7 +145,7 @@ class DepenseController extends AbstractController
                 $moto_id = $content['moto'];
                 $moto = $entityManager->getRepository(Moto::class)->findOneBy(['id'=>$moto_id, 'user'=>$user]);
                 if (!$moto){
-                    return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], 401);
+                    return new JsonResponse(['error' => 'La moto introuvable ou ne vous appartient pas'], Response::HTTP_UNAUTHORIZED);
                 }
                 unset($content['moto']);
             }
@@ -154,7 +154,7 @@ class DepenseController extends AbstractController
                 $depenseType_id = $content['depenseType'];
                 $depenseType = $entityManager->getRepository(DepenseType::class)->findOneBy(['id'=>$depenseType_id, 'user'=>$user]);
                 if (!$depenseType){
-                    return new JsonResponse(['error' => 'Type de dépense introuvable ou ne vous appartient pas'], 401);
+                    return new JsonResponse(['error' => 'Type de dépense introuvable ou ne vous appartient pas'], Response::HTTP_UNAUTHORIZED);
                 }
                 unset($content['depenseType']);
             }
@@ -178,9 +178,9 @@ class DepenseController extends AbstractController
             $entityManager->persist($depense);
             $entityManager->flush();
 
-            return new JsonResponse($serializer->serialize($depense, 'json'), 200, [], true);
+            return new JsonResponse($serializer->serialize($depense, 'json'), Response::HTTP_OK, [], true);
         } else {
-            return new JsonResponse(['error' => 'Dépense introuvable'], 401);
+            return new JsonResponse(['error' => 'Dépense introuvable'], Response::HTTP_UNAUTHORIZED);
         }
     }
 
@@ -195,9 +195,9 @@ class DepenseController extends AbstractController
         if ($depense){
             $entityManager->remove($depense);
             $entityManager->flush();
-            return new JsonResponse('dépense supprimée', 202,);
+            return new JsonResponse('dépense supprimée', Response::HTTP_ACCEPTED,);
         } else {
-            return new JsonResponse(['error' => 'Dépense introuvable'], 401);
+            return new JsonResponse(['error' => 'Dépense introuvable'], Response::HTTP_UNAUTHORIZED);
         }
     }
 }

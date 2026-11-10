@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTimeInterface;
 use App\Entity\User;
 use App\Entity\Moto;
 use ApiPlatform\Metadata\ApiResource;
@@ -53,7 +54,7 @@ class Entretien
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(['entretiens:read', 'entretiens:write'])]
-    private ?\DateTimeInterface $date = null;
+    private ?DateTimeInterface $date = null;
 
     #[ORM\ManyToOne(inversedBy: 'entretiens')]
     #[ORM\JoinColumn(nullable: false)]
@@ -122,12 +123,12 @@ class Entretien
         return $this;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): ?DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $date): static
+    public function setDate(DateTimeInterface $date): static
     {
         $this->date = $date;
 

@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Entity\Depense;
 use Symfony\Component\HttpFoundation\Response;
 
 class CsvService
@@ -11,7 +10,7 @@ class CsvService
     {
         $fp = fopen('php://temp', 'w');
         foreach ($list as $fields) {
-            fputcsv($fp, $fields);
+            fputcsv($fp, $fields, escape: '');
         }
 
         rewind($fp);

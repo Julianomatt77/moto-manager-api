@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
+use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\DepenseType;
-use App\Repository\DepenseRepository;
 use App\Repository\DepenseTypeRepository;
 use App\Repository\UserRepository;
 use App\Service\AnnuaireService;
@@ -13,25 +13,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class DepenseTypeController extends AbstractController
 {
-    private JWTTokenManagerInterface $jwtManager;
-    private TokenStorageInterface $tokenStorageInterface;
-    private UserRepository $userRepository;
-    private AnnuaireService $annuaire;
-    private DepenseTypeRepository $depenseTypeRepository;
-
-    public function __construct(TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager, UserRepository $userRepository, AnnuaireService $annuaire, DepenseTypeRepository $depenseTypeRepository)
+    public function __construct(private readonly TokenStorageInterface $tokenStorageInterface, private readonly JWTTokenManagerInterface $jwtManager, private readonly UserRepository $userRepository, private readonly AnnuaireService $annuaire, private readonly DepenseTypeRepository $depenseTypeRepository)
     {
-        $this->jwtManager = $jwtManager;
-        $this->tokenStorageInterface = $tokenStorageInterface;
-        $this->userRepository = $userRepository;
-        $this->annuaire = $annuaire;
-        $this->depenseTypeRepository = $depenseTypeRepository;
     }
 
     #[Route(
@@ -44,7 +32,7 @@ class DepenseTypeController extends AbstractController
 
         $json = $serializer->serialize($depensesTypes, 'json', ['groups' => 'depensesTypes:read']);
 
-        return new JsonResponse($json, 200, [], true);
+        return new JsonResponse($json, Response::HTTP_OK, [], true);
     }
 
     #[Route(
@@ -57,7 +45,7 @@ class DepenseTypeController extends AbstractController
 
         $existingType = $this->depenseTypeRepository->findBy(['user' => $user, 'name'=>json_decode($content, true)['name']]);
         if ($existingType){
-            return new JsonResponse(['error' => 'Ce type de dépense existe déjà'], 409);
+            return new JsonResponse(['error' => 'Ce type de dépense existe déjà'], Response::HTTP_CONFLICT);
         }
 
         $depenseType = $serializer->deserialize($content, DepenseType::class, 'json', ['groups' => 'depensesTypes:write']);
@@ -66,7 +54,7 @@ class DepenseTypeController extends AbstractController
         $entityManager->persist($depenseType);
         $entityManager->flush();
 
-        return new JsonResponse($serializer->serialize($depenseType, 'json'), 201, [], true);
+        return new JsonResponse($serializer->serialize($depenseType, 'json'), Response::HTTP_CREATED, [], true);
 
     }
 
@@ -80,7 +68,7 @@ class DepenseTypeController extends AbstractController
 
         $json = $serializer->serialize($depenseType, 'json', ['groups' => 'depensesTypes:read']);
 
-        return new JsonResponse($json, 200, [], true);
+        return new JsonResponse($json, Response::HTTP_OK, [], true);
     }
 
     #[Route(
@@ -93,12 +81,12 @@ class DepenseTypeController extends AbstractController
 
         $depenseType = $this->depenseTypeRepository->findOneBy(['id'=>$depenseType->getId(), 'user'=>$user]);
         if (!$depenseType){
-            return new JsonResponse(['error' => 'Type de dépense introuvable'], 401);
+            return new JsonResponse(['error' => 'Type de dépense introuvable'], Response::HTTP_UNAUTHORIZED);
         }
 
         $existingType = $this->depenseTypeRepository->findBy(['user' => $user, 'name'=>json_decode($content, true)['name']]);
         if ($existingType){
-            return new JsonResponse(['error' => 'Ce type de dépense existe déjà'], 409);
+            return new JsonResponse(['error' => 'Ce type de dépense existe déjà'], Response::HTTP_CONFLICT);
         }
 
         $depenseType = $serializer->deserialize($content, DepenseType::class, 'json', ['groups' => 'depensesTypes:write', 'object_to_populate' => $depenseType]);
@@ -106,7 +94,7 @@ class DepenseTypeController extends AbstractController
         $entityManager->persist($depenseType);
         $entityManager->flush();
 
-        return new JsonResponse($serializer->serialize($depenseType, 'json'), 200, [], true);
+        return new JsonResponse($serializer->serialize($depenseType, 'json'), Response::HTTP_OK, [], true);
 
     }
 
@@ -121,9 +109,9 @@ class DepenseTypeController extends AbstractController
         if ($depenseType){
             $entityManager->remove($depenseType);
             $entityManager->flush();
-            return new JsonResponse('Type de dépense supprimée', 202,);
+            return new JsonResponse('Type de dépense supprimée', Response::HTTP_ACCEPTED,);
         } else {
-            return new JsonResponse(['error' => 'Dépense introuvable'], 401);
+            return new JsonResponse(['error' => 'Dépense introuvable'], Response::HTTP_UNAUTHORIZED);
         }
     }
 }
