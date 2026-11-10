@@ -18,10 +18,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: MotoRepository::class)]
-#[Gedmo\SoftDeleteable(['deletedAt', false, false])]
+#[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: false)]
 #[ApiResource(operations: [
 		new GetCollection(uriTemplate: '/api/motos', controller: MotoController::class, name: 'app_moto_all'),
         new GetCollection(uriTemplate: '/api/motos/deactivated', controller: MotoController::class, name: 'app_moto_deactivated'),
@@ -59,7 +59,7 @@ class Moto
     #[ORM\ManyToOne(inversedBy: 'motos')]
     #[ORM\JoinColumn(nullable: false)]
 	#[Groups('moto:read')]
-    private ?user $user = null;
+    private ?User $user = null;
 
     #[ORM\OneToMany(mappedBy: 'moto', targetEntity: Depense::class)]
     private Collection $depenses;
@@ -67,7 +67,7 @@ class Moto
     #[ORM\OneToMany(mappedBy: 'moto', targetEntity: Entretien::class)]
     private Collection $entretiens;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     #[Groups(['moto:read', 'moto:write'])]
     protected $deletedAt;
 
@@ -110,12 +110,12 @@ class Moto
         return $this;
     }
 
-    public function getUser(): ?user
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(?user $user): static
+    public function setUser(?User $user): static
     {
         $this->user = $user;
 

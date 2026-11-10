@@ -17,7 +17,7 @@ use App\Repository\DepenseRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: DepenseRepository::class)]
 #[ApiResource(
@@ -46,7 +46,7 @@ class Depense
     #[ORM\ManyToOne(inversedBy: 'depenses')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['depenses:read'])]
-    private ?user $user = null;
+    private ?User $user = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['depenses:read', 'depenses:write'])]
@@ -103,12 +103,12 @@ class Depense
         return $this;
     }
 
-    public function getUser(): ?user
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(?user $user): static
+    public function setUser(?User $user): static
     {
         $this->user = $user;
 

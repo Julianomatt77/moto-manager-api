@@ -15,7 +15,7 @@ use App\Controller\EntretienController;
 use App\Repository\EntretienRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: EntretienRepository::class)]
 #[ApiResource(
@@ -59,7 +59,7 @@ class Entretien
     #[ORM\ManyToOne(inversedBy: 'entretiens')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['entretiens:read', 'entretiens:write'])]
-    private ?user $user = null;
+    private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'entretiens')]
     #[ORM\JoinColumn(nullable: false)]
@@ -135,12 +135,12 @@ class Entretien
         return $this;
     }
 
-    public function getUser(): ?user
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(?user $user): static
+    public function setUser(?User $user): static
     {
         $this->user = $user;
 

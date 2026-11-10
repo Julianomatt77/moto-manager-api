@@ -8,9 +8,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "api-platform/core": "^4.1",
-        "doctrine/doctrine-bundle": "^2.10",
         "doctrine/doctrine-migrations-bundle": "^3.2",
-        "doctrine/orm": "^2.16",
         "lexik/jwt-authentication-bundle": "^2.19",
         "nelmio/cors-bundle": "^2.3",
         "phpdocumentor/reflection-docblock": "^5.3",
@@ -85,7 +83,10 @@
         }
     },
     "require-dev": {
-        "doctrine/doctrine-fixtures-bundle": "^3.4",
+        "doctrine/dbal": "^4.0",
+        "doctrine/doctrine-bundle": "^3.0",
+        "doctrine/doctrine-fixtures-bundle": "^4.0",
+        "doctrine/orm": "^3.3",
         "rector/rector": "^2.8",
         "symfony/maker-bundle": "^1.51",
         "symfony/stopwatch": "7.4.*",
