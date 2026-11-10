@@ -19,3 +19,8 @@
 - composer require lexik/jwt-authentication-bundle
 
 symfony console doctrine:database:create
+
+## Déploiement
+
+- git fetch / pull automatique sur le serveur
+- `composer2 install`
