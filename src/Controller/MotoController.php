@@ -136,7 +136,6 @@ class MotoController extends AbstractController
         name: 'app_moto_reactivate',
         methods: ['PATCH']
     )]
-    #[ParamConverter('moto', options: ['disabled' => true])]
     public function reactivate(Request $request, EntityManagerInterface $entityManager, MotoRepository $motoRepository, SerializerInterface $serializer, int $id): Response
     {
         $entityManager->getFilters()->disable('softdeleteable');
